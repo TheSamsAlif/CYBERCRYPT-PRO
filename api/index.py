@@ -4,12 +4,23 @@ import sys
 # Add the parent directory to the Python path so we can import 'cybercrypt'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from cybercrypt.core import caesar_cipher, vigenere_cipher, random_layer
 
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 app = Flask(__name__)
 CORS(app)
+
+@app.route("/")
+def home():
+    """Serve the web dashboard."""
+    return send_from_directory(ROOT, "index.html")
+
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "ok"})
 
 @app.route("/api/encrypt", methods=["POST"])
 def encrypt():
