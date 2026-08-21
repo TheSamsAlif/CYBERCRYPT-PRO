@@ -351,7 +351,8 @@
     outline: none; min-height: 44px; max-height: 180px; line-height: 1.5;
   }
   .composer textarea::placeholder { color: var(--text-faint); }
-  .composer-bottom { display: flex; align-items: center; gap: 8px; margin-top: 11px; flex-wrap: wrap; }
+  .composer-bottom { display: flex; align-items: center; gap: 8px; margin-top: 11px; }
+  .keys-row { display: flex; align-items: center; gap: 8px; margin-top: 11px; }
   .key-input {
     background: rgba(0, 0, 0, .3);
     border: 1px solid var(--border-glass);
@@ -395,15 +396,115 @@
     color: var(--text);
   }
 
+  /* ============ INFO VIEWS (Architecture / Method) ============ */
+  .info-view { flex: 1; overflow-y: auto; display: none; }
+  .info-inner {
+    max-width: 780px; margin: 0 auto;
+    padding: 10px 16px 44px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .info-inner h2 { font-size: 27px; font-weight: 700; }
+  .info-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 6px; line-height: 1.6; }
+  .info-card {
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px; padding: 18px 21px;
+    line-height: 1.65; font-size: 14px; color: var(--text-muted);
+    animation: fadeUp .35s ease backwards;
+  }
+  .info-card:nth-child(3) { animation-delay: .06s; }
+  .info-card:nth-child(4) { animation-delay: .12s; }
+  .info-card:nth-child(5) { animation-delay: .18s; }
+  .info-card:nth-child(6) { animation-delay: .24s; }
+  .info-card:nth-child(7) { animation-delay: .30s; }
+  .info-card b { color: var(--text); }
+  .info-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 9px; }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .flow-arrow { color: var(--text-faint); }
+  .flow-chip {
+    background: rgba(96,165,250,.12);
+    border: 1px solid rgba(96,165,250,.3);
+    color: var(--accent); padding: 7px 13px;
+    border-radius: 999px; font-size: 12px;
+    font-family: Consolas, monospace;
+  }
+  .step-card {
+    display: flex; gap: 15px; align-items: flex-start;
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px; padding: 17px 20px;
+    animation: fadeUp .35s ease backwards;
+  }
+  .step-card:nth-child(3) { animation-delay: .05s; }
+  .step-card:nth-child(4) { animation-delay: .10s; }
+  .step-card:nth-child(5) { animation-delay: .15s; }
+  .step-card:nth-child(6) { animation-delay: .20s; }
+  .step-card:nth-child(7) { animation-delay: .25s; }
+  .step-card:nth-child(8) { animation-delay: .30s; }
+  .step-num {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; font-weight: 800; font-size: 13px;
+    box-shadow: 0 0 14px rgba(96,165,250,.35);
+  }
+  .step-body { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+  .step-body b { color: var(--text); display: block; margin-bottom: 3px; font-size: 14.5px; }
+  .step-formula {
+    display: inline-block; margin-top: 7px;
+    font-family: Consolas, monospace; font-size: 12px;
+    color: var(--accent-3);
+    background: rgba(0, 0, 0, .3);
+    border: 1px solid var(--border-glass);
+    padding: 6px 11px; border-radius: 8px;
+  }
+
+  /* ============ BACKDROP (mobile sidebar) ============ */
+  .backdrop {
+    position: fixed; inset: 0; z-index: 25;
+    background: rgba(0, 0, 0, .55);
+    opacity: 0; pointer-events: none;
+    transition: opacity .22s;
+  }
+  .backdrop.show { opacity: 1; pointer-events: auto; }
+
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
 
+  /* ============ MOBILE / TABLET ============ */
   @media (max-width: 720px) {
-    .sidebar { position: fixed; z-index: 20; height: 100%; }
+    .sidebar {
+      position: fixed; z-index: 30; height: 100dvh;
+      box-shadow: 24px 0 60px rgba(0, 0, 0, .5);
+    }
     .sidebar.hidden { margin-left: -264px; }
-    .empty-state h1 { font-size: 27px; }
+    .empty-state h1 { font-size: 26px; }
+    .empty-state { padding-top: 10px; }
+    .hero-chips { gap: 7px; }
+    .hero-chip { font-size: 11px; padding: 7px 12px; }
+    .model-chip { font-size: 12px; padding: 7px 12px; }
+    .keys-btn { padding: 8px 13px; font-size: 12px; }
+    .icon-btn { padding: 7px 10px; }
+    .topbar { padding: 10px 12px; }
+    .chat-area { padding: 0 10px 16px; }
+    .composer-wrap { padding: 6px 10px 14px; }
+    .composer { padding: 12px 13px 11px; border-radius: 20px; }
+    .keys-row { flex-wrap: wrap; gap: 7px; }
     .key-label { display: none; }
+    .key-input { flex: 1; min-width: 72px; width: auto; }
+    .key-input.wide { flex: 1.4; min-width: 104px; width: auto; }
+    .dice-btn, .send-btn { width: 42px; height: 42px; }
+    .layer-step { flex-wrap: wrap; gap: 8px; }
+    .layer-step .tag { min-width: 0; width: 100%; }
+    .copy-mini { margin-left: 0; }
+    .bubble { padding: 13px 15px; }
+    .info-inner { padding: 6px 12px 36px; }
+    .info-inner h2 { font-size: 22px; }
+    .step-card { padding: 14px 15px; gap: 12px; }
+    .info-card { padding: 15px 16px; }
   }
 </style>
 </head>
@@ -415,6 +516,9 @@
   <div class="orb o2"></div>
   <div class="orb o3"></div>
 </div>
+
+<!-- mobile sidebar backdrop -->
+<div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
 
 <!-- ================= SIDEBAR ================= -->
 <aside class="sidebar" id="sidebar">
@@ -432,6 +536,10 @@
       🔒&nbsp; Encrypt</button>
   <button class="nav-item" id="nav-decrypt" onclick="setMode('decrypt')">
       🔓&nbsp; Decrypt</button>
+  <button class="nav-item" id="nav-arch" onclick="showView('arch')">
+      🏗&nbsp; Project Architecture</button>
+  <button class="nav-item" id="nav-method" onclick="showView('method')">
+      ⚙️&nbsp; Working Method</button>
   <button class="nav-item" onclick="clearAll()">🗑 &nbsp;Clear Chat</button>
 
   <div class="section-head">
@@ -475,22 +583,146 @@
     <div class="chat-inner" id="chatInner"></div>
   </div>
 
+  <!-- ============ PROJECT ARCHITECTURE VIEW ============ -->
+  <div class="info-view" id="viewArch">
+    <div class="info-inner">
+      <h2>🏗 Project Architecture</h2>
+      <p class="info-sub">One cryptographic core, two frontends — a native
+      desktop app and a serverless web app sharing the exact same engine.</p>
+
+      <div class="info-card">
+        <div class="info-card-title">🌐 Web Frontend — Vercel</div>
+        <b>index.html</b> is the premium glass chat UI you are using right
+        now — sidebar, composer and animated layer steps, running fully in
+        your browser. Encrypt / Decrypt requests go to two Vercel serverless
+        functions: <b>api/encrypt.py</b> and <b>api/decrypt.py</b> (Flask),
+        which import the same core engine and return JSON results.
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">🖥 Desktop Frontend — CustomTkinter</div>
+        <b>main.py</b> launches the native window (<b>cybercrypt/app.py</b>).
+        Every screen lives in <b>cybercrypt/ui/screens/</b> — dashboard,
+        encrypt, decrypt, analysis, architecture, guide and about — built
+        with animated glass widgets, tooltips and a dark/light theme engine.
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">🧠 Core Engine — cybercrypt/core</div>
+        Pure Python with zero UI dependencies, so both frontends call the
+        identical logic:
+        <div class="flow">
+          <span class="flow-chip">caesar_cipher.py</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">vigenere_cipher.py</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">random_layer.py</span>
+        </div>
+        Unified by <b>engine.py</b>, while <b>alphabet.py</b> defines the
+        128-character printable alphabet every layer operates on.
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">📡 Web Request Flow</div>
+        <div class="flow">
+          <span class="flow-chip">You type</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">fetch /api/encrypt</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">Flask function</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">engine.encrypt_text()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">JSON steps</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-chip">animated result</span>
+        </div>
+        Nothing is stored on any server — your text exists only in the
+        request, the response and your screen.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WORKING METHOD VIEW ============ -->
+  <div class="info-view" id="viewMethod">
+    <div class="info-inner">
+      <h2>⚙️ Working Method</h2>
+      <p class="info-sub">How your message travels through three classical
+      cipher layers — and how it comes back.</p>
+
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-body"><b>Input &amp; Keys</b>
+          You type a message and provide three keys: a Caesar shift number,
+          a Vigenère keyword and a numeric XOR seed. The 🎲 button can
+          generate all three randomly.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-body"><b>Layer 1 · Caesar Cipher</b>
+          Every character is shifted forward by your shift number, wrapping
+          inside the 128-character alphabet.
+          <span class="step-formula">E(x) = (x + shift) mod 128</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-body"><b>Layer 2 · Vigenère Cipher</b>
+          A repeating keyword applies a different offset to each character,
+          so the same letter encrypts differently every time.
+          <span class="step-formula">E(x) = (x + key[i]) mod 128</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-body"><b>Layer 3 · Random XOR</b>
+          Your seed drives a pseudo-random keystream that is XOR-ed with the
+          text — impossible to guess without the exact seed.
+          <span class="step-formula">E(x) = x ⊕ stream(i)</span>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-body"><b>Cipher Text</b>
+          The final output is unreadable and safe to share. Each intermediate
+          layer result is shown step by step in the chat.
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">6</div>
+        <div class="step-body"><b>Decryption — Exact Reverse</b>
+          With the same three keys, the layers are peeled off in reverse
+          order: XOR → Vigenère → Caesar → your original text.
+          <span class="step-formula">D(x) = D₁(D₂(D₃(cipher)))</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Composer -->
-  <div class="composer-wrap">
+  <div class="composer-wrap" id="composerWrap">
     <div class="composer">
       <textarea id="inputText" rows="1"
         placeholder="Type your message…"></textarea>
+      <div class="keys-row">
+        <span class="key-label">SHIFT</span>
+        <input class="key-input" id="kShift" value="27" inputmode="numeric" placeholder="Shift">
+        <span class="key-label">KEY</span>
+        <input class="key-input wide" id="kKey" value="FVM6BYKS3T" placeholder="Keyword">
+        <span class="key-label">SEED</span>
+        <input class="key-input" id="kSeed" value="513439" inputmode="numeric" placeholder="Seed">
+      </div>
       <div class="composer-bottom">
         <div class="mode-switch">
           <button id="mEnc" class="on" onclick="setMode('encrypt')">Encrypt</button>
           <button id="mDec" onclick="setMode('decrypt')">Decrypt</button>
         </div>
-        <span class="key-label">SHIFT</span>
-        <input class="key-input" id="kShift" value="27" inputmode="numeric">
-        <span class="key-label">KEY</span>
-        <input class="key-input wide" id="kKey" value="FVM6BYKS3T">
-        <span class="key-label">SEED</span>
-        <input class="key-input" id="kSeed" value="513439" inputmode="numeric">
         <button class="dice-btn" title="Random keys" onclick="generateKeys()">🎲</button>
         <button class="send-btn" id="sendBtn" title="Run" onclick="run()">➤</button>
       </div>
@@ -503,13 +735,31 @@ const $ = id => document.getElementById(id);
 let mode = 'encrypt';
 let busy = false;
 
+/* ---------- view switching ---------- */
+function showView(v) {
+  const chat = v === 'chat';
+  $('chatArea').style.display = chat ? 'flex' : 'none';
+  $('composerWrap').style.display = chat ? 'flex' : 'none';
+  $('viewArch').style.display = v === 'arch' ? 'block' : 'none';
+  $('viewMethod').style.display = v === 'method' ? 'block' : 'none';
+  $('nav-arch').classList.toggle('active', v === 'arch');
+  $('nav-method').classList.toggle('active', v === 'method');
+  if (chat) {
+    $('nav-encrypt').classList.toggle('active', mode === 'encrypt');
+    $('nav-decrypt').classList.toggle('active', mode === 'decrypt');
+  } else {
+    $('nav-encrypt').classList.remove('active');
+    $('nav-decrypt').classList.remove('active');
+  }
+  closeSidebar();
+}
+
 /* ---------- mode ---------- */
 function setMode(m) {
   mode = m;
+  showView('chat');
   $('mEnc').classList.toggle('on', m === 'encrypt');
   $('mDec').classList.toggle('on', m === 'decrypt');
-  $('nav-encrypt').classList.toggle('active', m === 'encrypt');
-  $('nav-decrypt').classList.toggle('active', m === 'decrypt');
   $('sendBtn').classList.toggle('dec', m === 'decrypt');
   $('greeting').textContent = m === 'encrypt'
     ? 'Ready when you are.' : 'Decrypt a message.';
@@ -519,7 +769,25 @@ function setMode(m) {
     : 'Paste the encrypted text with the exact same keys to peel off all three layers.');
 }
 
-function toggleSidebar() { $('sidebar').classList.toggle('hidden'); }
+function toggleSidebar() {
+  $('sidebar').classList.toggle('hidden');
+  syncBackdrop();
+}
+function closeSidebar() {
+  if (window.matchMedia('(max-width: 720px)').matches) {
+    $('sidebar').classList.add('hidden');
+  }
+  syncBackdrop();
+}
+function syncBackdrop() {
+  const open = !$('sidebar').classList.contains('hidden');
+  const mobile = window.matchMedia('(max-width: 720px)').matches;
+  $('backdrop').classList.toggle('show', open && mobile);
+}
+window.addEventListener('resize', syncBackdrop);
+if (window.matchMedia('(max-width: 720px)').matches) {
+  $('sidebar').classList.add('hidden');
+}
 function newSession() { clearAll(); setMode('encrypt'); $('inputText').focus(); }
 function clearAll() {
   $('chatInner').innerHTML = '';
