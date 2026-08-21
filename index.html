@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberCrypt Pro - Multi-Layer Secure Text Encryption</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Consolas&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070B16;
+            --bg-light: #0A1022;
+            --glass: rgba(15, 25, 48, 0.75);
+            --glass-hover: rgba(20, 35, 62, 0.85);
+            --glass-input: rgba(12, 21, 38, 0.9);
+            --border: rgba(43, 62, 102, 0.45);
+            --border-glow: #3B82F6;
+            --primary: #3B82F6;
+            --primary-deep: #1E3A8A;
+            --accent: #60A5FA;
+            --success: #22C55E;
+            --success-tint: rgba(14, 36, 24, 0.6);
+            --error: #EF4444;
+            --text: #FFFFFF;
+            --text-muted: #A0AEC0;
+            --text-faint: #5B6E96;
+            --shadow: rgba(3, 5, 12, 0.5);
+            --font-main: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Consolas', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-light));
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient glow orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            top: 10%;
+            left: -100px;
+        }
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            bottom: 10%;
+            right: -150px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 20px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            flex-grow: 1;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 12px;
+        }
+        .app-logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .app-logo span {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.4);
+        }
+        header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* Workspace Grid */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 26px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .glass-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px 0 rgba(96, 165, 250, 0.15);
+            background: var(--glass-hover);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: -12px;
+            margin-bottom: 16px;
+        }
+        .counter {
+            font-size: 10px;
+            color: var(--text-faint);
+        }
+
+        /* Inputs and Textareas */
+        textarea, input {
+            width: 100%;
+            background: var(--glass-input);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-size: 14px;
+            padding: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+        textarea.output-box {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            background: rgba(12, 21, 38, 0.6);
+        }
+        textarea:focus, input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+        }
+
+        .field-group {
+            margin-bottom: 14px;
+        }
+        .field-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: var(--font-main);
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+            padding: 14px 24px;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background: var(--accent);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+        }
+        .btn-secondary {
+            background: var(--glass-input);
+            border-color: var(--border);
+            color: var(--text);
+            padding: 10px 18px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(20, 35, 62, 0.6);
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 8px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Pipeline Panels */
+        .pipeline-container {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            background: rgba(12, 21, 38, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            gap: 12px;
+            transition: all 0.4s ease;
+        }
+        .step-medallion {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--glass-input);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-faint);
+            transition: all 0.4s ease;
+        }
+        .step-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.4s ease;
+        }
+        .step-status {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--text-faint);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.4s ease;
+        }
+        .step-status::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-faint);
+            transition: all 0.4s ease;
+        }
+
+        /* Step states */
+        .pipeline-step.running {
+            border-color: var(--accent);
+            background: rgba(30, 58, 138, 0.4);
+        }
+        .pipeline-step.running .step-medallion {
+            background: var(--primary-deep);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .pipeline-step.running .step-name {
+            color: var(--text);
+        }
+        .pipeline-step.running .step-status {
+            color: var(--accent);
+        }
+        .pipeline-step.running .step-status::before {
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .pipeline-step.done {
+            border-color: var(--success);
+            background: rgba(14, 36, 24, 0.4);
+        }
+        .pipeline-step.done .step-medallion {
+            background: var(--success-tint);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .pipeline-step.done .step-name {
+            color: var(--text);
+        }
+        .pipeline-step.done .step-status {
+            color: var(--success);
+        }
+        .pipeline-step.done .step-status::before {
+            background: var(--success);
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        .arrow {
+            text-align: center;
+            color: var(--text-faint);
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        /* Premium attribution footer */
+        footer.developer-attribution {
+            width: 100%;
+            max-width: 1200px;
+            padding: 16px 20px;
+            margin-top: auto;
+            margin-bottom: 24px;
+            z-index: 1;
+        }
+        .footer-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 26px;
+            padding: 16px;
+            box-shadow: 0 8px 32px 0 var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .footer-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px 0 rgba(96, 165, 250, 0.15);
+            background: var(--glass-hover);
+        }
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .footer-medallion {
+            width: 32px;
+            height: 32px;
+            border-radius: 12px;
+            background: rgba(18, 38, 77, 0.6);
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .footer-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .footer-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .footer-subtitle {
+            font-size: 10px;
+            color: var(--text-faint);
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(14, 36, 24, 0.95);
+            border: 1px solid var(--success);
+            padding: 12px 24px;
+            border-radius: 20px;
+            z-index: 10;
+            box-shadow: 0 8px 32px var(--shadow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast.error {
+            background: rgba(42, 16, 22, 0.95);
+            border-color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <!-- App Header -->
+        <header>
+            <div class="app-logo"><span>✦</span> CyberCrypt Pro</div>
+            <p>Web Platform • Layer-by-layer secure cryptographic processor</p>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Left Workspace (Inputs/Outputs) -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Input Card -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Plain Text Input</div>
+                        <div class="counter" id="char-count">0 characters</div>
+                    </div>
+                    <textarea id="input-text" placeholder="Type or paste your message here..."></textarea>
+                </div>
+
+                <!-- Live Pipeline -->
+                <div class="glass-card" style="padding: 18px 24px;">
+                    <div class="card-header" style="margin-bottom: 12px;">
+                        <div class="card-title" style="font-size: 14px;">Encryption Pipeline</div>
+                        <div class="counter" id="pipeline-status">Idle</div>
+                    </div>
+                    <div class="pipeline-container">
+                        <div class="pipeline-step" id="step-caesar">
+                            <div class="step-medallion">A</div>
+                            <div class="step-name">Caesar Cipher</div>
+                            <div class="step-status">Idle</div>
+                        </div>
+                        <div class="arrow">↓</div>
+                        <div class="pipeline-step" id="step-vigenere">
+                            <div class="step-medallion">V</div>
+                            <div class="step-name">Vigenere Cipher</div>
+                            <div class="step-status">Idle</div>
+                        </div>
+                        <div class="arrow">↓</div>
+                        <div class="pipeline-step" id="step-xor">
+                            <div class="step-medallion">X</div>
+                            <div class="step-name">Random XOR Layer</div>
+                            <div class="step-status">Idle</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Card -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">Process Output</div>
+                        <button class="btn btn-secondary btn-small" id="copy-btn">❏ Copy</button>
+                    </div>
+                    <textarea id="output-text" class="output-box" placeholder="Your output will appear here..." readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Right Sidebar (Keys & Actions) -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Keys Panel -->
+                <div class="glass-card">
+                    <div class="card-title" style="margin-bottom: 4px;">Cryptographic Keys</div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">The exact keys are required to decrypt.</p>
+
+                    <div class="field-group">
+                        <label class="field-label" for="key-shift">Caesar Shift (1 - 127)</label>
+                        <input type="number" id="key-shift" min="1" max="127" placeholder="e.g. 7">
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="key-vigenere">Vigenere Key (Alphanumeric)</label>
+                        <input type="text" id="key-vigenere" placeholder="e.g. SECRETKEY">
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="key-seed">Random Seed (Whole Number)</label>
+                        <input type="number" id="key-seed" placeholder="e.g. 123456">
+                    </div>
+
+                    <button class="btn btn-secondary btn-small" style="width: 100%; margin-top: 6px;" id="btn-generate">✚ Generate Random Keys</button>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="glass-card" style="display: flex; flex-direction: column; gap: 12px; padding: 20px;">
+                    <button class="btn btn-primary" id="btn-encrypt">▣ Encrypt Live</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" style="flex: 1;" id="btn-decrypt">▤ Decrypt</button>
+                        <button class="btn btn-secondary" style="flex: 1;" id="btn-clear">✕ Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Footer -->
+        <footer class="developer-attribution">
+            <div class="footer-card">
+                <div class="footer-inner">
+                    <div class="footer-medallion">✦</div>
+                    <div class="footer-text">
+                        <div class="footer-title">Developed By Sams Alif</div>
+                        <div class="footer-subtitle">Secure Multi-Layer Text Encryption System</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✓</span> <span id="toast-msg">Success</span>
+    </div>
+
+    <!-- Script Operations -->
+    <script>
+        // DOM Elements
+        const inputText = document.getElementById('input-text');
+        const outputText = document.getElementById('output-text');
+        const charCount = document.getElementById('char-count');
+        const pipelineStatus = document.getElementById('pipeline-status');
+        const keyShift = document.getElementById('key-shift');
+        const keyVigenere = document.getElementById('key-vigenere');
+        const keySeed = document.getElementById('key-seed');
+        const copyBtn = document.getElementById('copy-btn');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastMsg = document.getElementById('toast-msg');
+
+        // Steps
+        const stepCaesar = document.getElementById('step-caesar');
+        const stepVigenere = document.getElementById('step-vigenere');
+        const stepXor = document.getElementById('step-xor');
+
+        // Character counter
+        inputText.addEventListener('input', () => {
+            const count = inputText.value.length;
+            charCount.textContent = `${count} characters`;
+        });
+
+        // Show Toast
+        function showToast(message, isError = false) {
+            toastMsg.textContent = message;
+            toastIcon.textContent = isError ? '✕' : '✓';
+            if (isError) {
+                toast.classList.add('error');
+            } else {
+                toast.classList.remove('error');
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Copy button
+        copyBtn.addEventListener('click', () => {
+            if (!outputText.value) {
+                showToast('Nothing to copy yet.', true);
+                return;
+            }
+            navigator.clipboard.writeText(outputText.value);
+            showToast('Copied to clipboard!');
+        });
+
+        // Generate Random Keys
+        document.getElementById('btn-generate').addEventListener('click', () => {
+            const randomShift = Math.floor(Math.random() * 127) + 1;
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let randomKey = "";
+            for (let i = 0; i < 10; i++) {
+                randomKey += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            }
+            const randomSeed = Math.floor(Math.random() * 900000) + 100000;
+
+            keyShift.value = randomShift;
+            keyVigenere.value = randomKey;
+            keySeed.value = randomSeed;
+            showToast('Generated fresh random keys.');
+        });
+
+        // Reset Pipeline UI
+        function resetPipeline() {
+            [stepCaesar, stepVigenere, stepXor].forEach(el => {
+                el.className = 'pipeline-step';
+                el.querySelector('.step-status').textContent = 'Idle';
+            });
+            pipelineStatus.textContent = 'Idle';
+        }
+
+        // Clear All
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+            charCount.textContent = '0 characters';
+            keyShift.value = '';
+            keyVigenere.value = '';
+            keySeed.value = '';
+            resetPipeline();
+            showToast('Cleared all fields.');
+        });
+
+        // Trigger Live Animation and Request API
+        async function runCrypto(type) {
+            const text = inputText.value.trim();
+            const shift = parseInt(keyShift.value);
+            const key = keyVigenere.value.trim();
+            const seed = parseInt(keySeed.value);
+
+            if (!text) {
+                showToast(`Please enter some text to ${type}.`, true);
+                return;
+            }
+            if (isNaN(shift) || shift < 1 || shift > 127) {
+                showToast('Caesar shift must be between 1 and 127.', true);
+                return;
+            }
+            if (!key) {
+                showToast('Vigenere key must contain alphanumeric characters.', true);
+                return;
+            }
+            if (isNaN(seed)) {
+                showToast('Random seed must be a whole number.', true);
+                return;
+            }
+
+            resetPipeline();
+            pipelineStatus.textContent = 'Processing...';
+
+            try {
+                // Call Vercel python serverless endpoint
+                const response = await fetch(`/api/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, shift, key, seed })
+                });
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Simulate the live animation step-by-step playback
+                if (type === 'encrypt') {
+                    // Caesar Layer 1
+                    stepCaesar.classList.add('running');
+                    stepCaesar.querySelector('.step-status').textContent = 'Running...';
+                    
+                    setTimeout(() => {
+                        stepCaesar.classList.remove('running');
+                        stepCaesar.classList.add('done');
+                        stepCaesar.querySelector('.step-status').textContent = 'Done';
+                        
+                        // Vigenere Layer 2
+                        stepVigenere.classList.add('running');
+                        stepVigenere.querySelector('.step-status').textContent = 'Running...';
+                        
+                        setTimeout(() => {
+                            stepVigenere.classList.remove('running');
+                            stepVigenere.classList.add('done');
+                            stepVigenere.querySelector('.step-status').textContent = 'Done';
+                            
+                            // Random XOR Layer 3
+                            stepXor.classList.add('running');
+                            stepXor.querySelector('.step-status').textContent = 'Running...';
+                            
+                            setTimeout(() => {
+                                stepXor.classList.remove('running');
+                                stepXor.classList.add('done');
+                                stepXor.querySelector('.step-status').textContent = 'Done';
+                                
+                                pipelineStatus.textContent = 'Completed';
+                                outputText.value = data.result;
+                                showToast('Encrypted successfully.');
+                            }, 700);
+                        }, 700);
+                    }, 700);
+                } else {
+                    // Decrypt goes in reverse order: XOR -> Vigenere -> Caesar
+                    stepXor.classList.add('running');
+                    stepXor.querySelector('.step-status').textContent = 'Running...';
+                    
+                    setTimeout(() => {
+                        stepXor.classList.remove('running');
+                        stepXor.classList.add('done');
+                        stepXor.querySelector('.step-status').textContent = 'Done';
+                        
+                        // Vigenere Layer 2
+                        stepVigenere.classList.add('running');
+                        stepVigenere.querySelector('.step-status').textContent = 'Running...';
+                        
+                        setTimeout(() => {
+                            stepVigenere.classList.remove('running');
+                            stepVigenere.classList.add('done');
+                            stepVigenere.querySelector('.step-status').textContent = 'Done';
+                            
+                            // Caesar Layer 1
+                            stepCaesar.classList.add('running');
+                            stepCaesar.querySelector('.step-status').textContent = 'Running...';
+                            
+                            setTimeout(() => {
+                                stepCaesar.classList.remove('running');
+                                stepCaesar.classList.add('done');
+                                stepCaesar.querySelector('.step-status').textContent = 'Done';
+                                
+                                pipelineStatus.textContent = 'Completed';
+                                outputText.value = data.result;
+                                showToast('Decrypted successfully.');
+                            }, 700);
+                        }, 700);
+                    }, 700);
+                }
+            } catch (err) {
+                resetPipeline();
+                pipelineStatus.textContent = 'Error';
+                showToast(err.message || 'An unexpected error occurred.', true);
+            }
+        }
+
+        // Bind Encrypt/Decrypt Buttons
+        document.getElementById('btn-encrypt').addEventListener('click', () => runCrypto('encrypt'));
+        document.getElementById('btn-decrypt').addEventListener('click', () => runCrypto('decrypt'));
+    </script>
+</body>
+</html>

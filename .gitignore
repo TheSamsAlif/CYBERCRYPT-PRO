@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Vercel
+.vercel/
+dist/
+out/
+build/
+
+# Local configuration
+.gemini/
+local_settings.json
+*.log
+scratch/
+walkthrough.md
+task.md
+implementation_plan.md
