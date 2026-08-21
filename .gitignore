@@ -33,3 +33,7 @@ task.md
 implementation_plan.md
 
 .vercel
+
+# Dev notes (local only)
+CHANGE_NOTE.md
+LAYOUT_BUG_FIX_REPORT.md
