@@ -104,14 +104,40 @@
     font-size: 11px; color: var(--text-faint);
     padding: 20px 14px 8px; font-weight: 700; letter-spacing: 1.2px;
   }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding-right: 8px; }
+  .clear-recent {
+    background: none; border: none; cursor: pointer;
+    font-size: 11px; color: var(--text-faint);
+    padding: 4px 10px; border-radius: 999px;
+    transition: all .15s;
+  }
+  .clear-recent:hover { color: var(--danger); background: rgba(248,113,113,.08); }
+
   .recent-list { flex: 1; overflow-y: auto; }
+  .recent-row {
+    display: flex; align-items: center;
+    border-radius: var(--radius-md);
+    transition: background .15s;
+  }
+  .recent-row:hover { background: var(--glass); }
   .recent-item {
-    padding: 10px 14px; border-radius: var(--radius-md);
+    flex: 1; min-width: 0;
+    padding: 10px 6px 10px 14px;
     font-size: 13px; color: var(--text-muted);
     cursor: pointer; white-space: nowrap; overflow: hidden;
-    text-overflow: ellipsis; transition: all .15s;
+    text-overflow: ellipsis; transition: color .15s;
   }
-  .recent-item:hover { background: var(--glass); color: var(--text); }
+  .recent-row:hover .recent-item { color: var(--text); }
+  .recent-del {
+    flex-shrink: 0; margin-right: 6px;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-faint); font-size: 12px;
+    opacity: 0; transition: all .15s;
+  }
+  .recent-row:hover .recent-del { opacity: 1; }
+  .recent-del:hover { color: #fff; background: rgba(248,113,113,.75); }
   .recent-empty { font-size: 12px; color: var(--text-faint); padding: 4px 14px; }
 
   /* ============ DEVELOPER CREDIT (animated) ============ */
@@ -408,7 +434,10 @@
       🔓&nbsp; Decrypt</button>
   <button class="nav-item" onclick="clearAll()">🗑 &nbsp;Clear Chat</button>
 
-  <div class="section-label">RECENT SESSIONS</div>
+  <div class="section-head">
+    <div class="section-label">RECENT SESSIONS</div>
+    <button class="clear-recent" onclick="clearRecents()">Clear</button>
+  </div>
   <div class="recent-list" id="recentList"></div>
 
   <!-- animated developer credit -->
@@ -505,29 +534,41 @@ function generateKeys() {
   $('kSeed').value = Math.floor(Math.random() * 1000000);
 }
 
-/* ---------- recents ---------- */
-function loadRecents() {
-  try { return JSON.parse(localStorage.getItem('cc_recents') || '[]'); }
-  catch { return []; }
-}
+/* ---------- recents (memory-only: cleared on refresh) ---------- */
+let recents = [];
+
 function addRecent(text, wasEncrypt) {
-  const list = loadRecents();
-  list.unshift({ t: text.slice(0, 46), m: wasEncrypt ? 'enc' : 'dec',
-                 time: new Date().toLocaleTimeString() });
-  localStorage.setItem('cc_recents', JSON.stringify(list.slice(0, 12)));
+  recents.unshift({ t: text.slice(0, 46), m: wasEncrypt ? 'enc' : 'dec' });
+  if (recents.length > 12) recents.pop();
+  renderRecents();
+}
+function deleteRecent(i) {
+  recents.splice(i, 1);
+  renderRecents();
+}
+function clearRecents() {
+  recents = [];
   renderRecents();
 }
 function renderRecents() {
-  const list = loadRecents();
   const el = $('recentList');
-  el.innerHTML = list.length ? '' :
+  el.innerHTML = recents.length ? '' :
     '<div class="recent-empty">No sessions yet.</div>';
-  list.forEach(r => {
+  recents.forEach((r, i) => {
+    const row = document.createElement('div');
+    row.className = 'recent-row';
     const d = document.createElement('div');
     d.className = 'recent-item';
     d.textContent = (r.m === 'enc' ? '🔒 ' : '🔓 ') + r.t;
+    d.title = 'Click to switch to ' + (r.m === 'enc' ? 'Encrypt' : 'Decrypt');
     d.onclick = () => setMode(r.m === 'enc' ? 'encrypt' : 'decrypt');
-    el.appendChild(d);
+    const x = document.createElement('button');
+    x.className = 'recent-del';
+    x.textContent = '✕';
+    x.title = 'Delete this session';
+    x.onclick = (e) => { e.stopPropagation(); deleteRecent(i); };
+    row.append(d, x);
+    el.appendChild(row);
   });
 }
 renderRecents();
