@@ -17,25 +17,35 @@ CyberCrypt Pro is a premium, multi-layer secure text encryption and decryption a
 
 ## Technical Architecture
 
-CyberCrypt Pro splits its architecture into three clean layers:
+CyberCrypt Pro runs on one shared cryptographic core with two frontends:
 
 ```
-                  ┌──────────────────────────────┐
-                  │          App Entry           │
-                  │   (main.py / api/index.py)   │
-                  └──────────────┬───────────────┘
-                                 │
-                  ┌──────────────▼───────────────┐
-                  │           UI Layer           │
-                  │  (CustomTkinter / Web UI)    │
-                  └──────────────┬───────────────┘
-                                 │
-                  ┌──────────────▼───────────────┐
-                  │          Core Engine         │
-                  │      (Caesar / Vigenere /    │
-                  │         Random XOR)          │
-                  └──────────────────────────────┘
+   DESKTOP (main.py)                      WEB (Vercel)
+        │                                      │
+ ┌──────▼───────────┐               ┌──────────▼──────────┐
+ │  CustomTkinter   │               │    index.html       │
+ │  Glass UI Layer  │               │  Glass Chat Web UI  │
+ │  (cybercrypt.ui) │               │  (sidebar+composer) │
+ └──────┬───────────┘               └──────────┬──────────┘
+        │                            fetch /api/encrypt
+        │                            fetch /api/decrypt
+        │                          ┌────────────▼────────────┐
+        │                          │  Serverless Functions   │
+        │                          │  api/encrypt.py         │
+        │                          │  api/decrypt.py (Flask) │
+        │                          └────────────┬────────────┘
+        │                                       │
+        └──────────────────┬────────────────────┘
+                  ┌────────▼─────────┐
+                  │    Core Engine   │
+                  │  (cybercrypt.core)│
+                  │  Caesar → Vigenère│
+                  │   → Random XOR   │
+                  └──────────────────┘
 ```
+
+**Encryption order (fixed):** Plain Text → Caesar → Vigenère → Random XOR → Cipher Text.
+**Decryption** reverses the exact same order with identical keys.
 
 ---
 
@@ -43,33 +53,49 @@ CyberCrypt Pro splits its architecture into three clean layers:
 
 ```
 .
-├── api/
-│   └── index.py            # Vercel serverless Python Flask application
+├── api/                          # Vercel serverless backend (Flask)
+│   ├── index.py                  #   Serves the web dashboard at "/"
+│   ├── encrypt.py                #   POST /api/encrypt — runs the 3-layer pipeline
+│   └── decrypt.py                #   POST /api/decrypt — peels off all 3 layers
 ├── cybercrypt/
-│   ├── core/
-│   │   ├── alphabet.py     # Base ASCII printable alphabet set
-│   │   ├── caesar_cipher.py# Shift encryption and decryption functions
-│   │   ├── engine.py       # Unified multi-layer encryption engine
-│   │   ├── random_layer.py # Seeded XOR keystream layer
-│   │   └── vigenere_cipher.py # Polyalphabetic substitution layer
+│   ├── core/                     # Pure cryptography — zero UI dependencies
+│   │   ├── alphabet.py           #   128-char printable alphabet set
+│   │   ├── caesar_cipher.py      #   Layer 1: shift cipher
+│   │   ├── vigenere_cipher.py    #   Layer 2: polyalphabetic substitution
+│   │   ├── random_layer.py       #   Layer 3: seeded XOR keystream
+│   │   └── engine.py             #   Unified multi-layer engine + key generator
 │   ├── ui/
-│   │   ├── screens/
-│   │   │   ├── base_screen.py  # Transparent base screen containing core scroll binds
-│   │   │   ├── dashboard_screen.py # Dashboard screen with developer footer card
-│   │   │   ├── encrypt_screen.py # Live encryption visualizer workspace
-│   │   │   └── decrypt_screen.py # Live decryption visualizer workspace
-│   │   ├── animation.py    # Colors, hover, focus, and flash animations
-│   │   ├── theme.py        # Spacing, font, and active theme palettes (Dark/Light)
-│   │   ├── panels.py       # Segmented progress bars and step-details panel widgets
-│   │   └── widgets.py      # Premium glass cards, buttons, entries, and toasts
-│   └── utils/
-│       └── helpers.py      # Estimated time calculations and helper functions
-├── tests/                  # Integration and unit tests
-├── main.py                 # Desktop application launch script
-├── vercel.json             # Vercel routing configurations
-├── requirements.txt        # Serverless backend package list
-├── run_tests.py            # Run script for the test suite
-└── README.md               # Project documentation
+│   │   ├── screens/              # One module per application screen
+│   │   │   ├── base_screen.py    #   Shared header, scroll container, safe geometry
+│   │   │   ├── dashboard_screen.py  # Hero, stat cards, pipeline, layer cards
+│   │   │   ├── encrypt_screen.py #   Live encryption workspace
+│   │   │   ├── decrypt_screen.py #   Live decryption workspace
+│   │   │   ├── analysis_screen.py#   Strength analysis and exportable reports
+│   │   │   ├── architecture_screen.py # Architecture explainer
+│   │   │   ├── guide_screen.py   #   User guide
+│   │   │   └── about_screen.py   #   About and credits
+│   │   ├── animation.py          # Color, hover, focus and flash animations
+│   │   ├── background.py         # Animated glass backdrop (orbs + gradient)
+│   │   ├── charts.py             # Canvas-drawn charts and meters
+│   │   ├── dialogs.py            # Modal dialogs and overlays
+│   │   ├── panels.py             # Pipeline panel, step details, summary popup
+│   │   ├── statusbar.py          # Bottom status bar
+│   │   ├── theme.py              # Colors, fonts, spacing, dark/light palettes
+│   │   ├── tooltip.py            # Hover tooltip bindings
+│   │   ├── visualizer.py         # Step builder for live visualization
+│   │   └── widgets.py            # Glass cards, buttons, entries, keys panel
+│   ├── utils/
+│   │   ├── helpers.py            # Time formatting and shared helpers
+│   │   └── settings.py           # Persistent app settings (load/save)
+│   ├── analysis.py               # Message statistics and strength scoring
+│   └── app.py                    # Main window: layout, navigation, screens
+├── tests/                        # Unit tests (core ciphers + analysis)
+├── index.html                    # Web dashboard (premium glass chat UI)
+├── main.py                       # Desktop entry point
+├── vercel.json                   # Vercel configuration
+├── requirements.txt              # Serverless backend packages (Flask)
+├── run_tests.py                  # Test runner script
+└── README.md                     # Project documentation
 ```
 
 ---
@@ -78,10 +104,10 @@ CyberCrypt Pro splits its architecture into three clean layers:
 
 ### 1. Prerequisite Packages
 
-Make sure you have Python 3.10+ installed. Install CustomTkinter for the desktop client:
+Make sure you have Python 3.10+ installed. Install CustomTkinter and Pillow for the desktop client:
 
 ```bash
-pip install customtkinter
+pip install customtkinter pillow
 ```
 
 If you plan to run the serverless web server locally:
